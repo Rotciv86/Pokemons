@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       width:{
-        '3/4vw': '75vh'
+        '3/4vw': '75vw'
       },
       height: {
         '3/4vh': '75vh'
