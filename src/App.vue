@@ -1,7 +1,7 @@
 <template>
   <div class="relative p-8 bg-purple-100">
-    <div class="flex justify-center" v-html="svgContent"></div>
-    
+    <div @click="getUrls" class="flex justify-center mb-20" v-html="svgContent"></div>
+    <Form @sendedSearchedPokemon="setSearchedPokemon" @liveFiltering="liveSearcher"/>
     <div class="flex justify-between my-8">
     <button class="p-4 rounded-xl bg-emerald-500 text-white hover:bg-emerald-200"  @click="previousPage">PREVIOUS</button>
     <button class="p-4 rounded-xl bg-emerald-500 text-white hover:bg-emerald-200 "  @click="nextPage">NEXT</button>
@@ -18,17 +18,20 @@
 </template>
 <script>
 import Featured from './components/Featured.vue';
+import Form from './components/Form.vue';
 import PokemonList from './components/PokemonList.vue';
 
 export default {
   name: "App",
   components: {
-    PokemonList,Featured
+    PokemonList,Featured,Form
   },
   data() {
     return {
       title : "Pokemon",
+      allData : "",
       data : "",
+      allPokemons: [],
       pokemons : [],
       selectedPokemonData: "",
       isVisibleFeatured: false,
@@ -37,15 +40,23 @@ export default {
   },
   async mounted() {
     
-   await fetch("https://pokeapi.co/api/v2/pokemon/").then(response => response.json()).then(data => this.data = data).catch(error => console.error(error))
-
+   await fetch("https://pokeapi.co/api/v2/pokemon").then(response => response.json()).then(data => this.data = data).catch(error => console.error(error))
 
     this.getUrls()
 
+    await fetch("https://pokeapi.co/api/v2/pokemon/?limit=1302").then(response => response.json()).then(data => this.allData = data).catch(error => console.error(error))
+
+    const results = this.allData.results
+
+    for (let pokemon of results){
+      fetch(`${pokemon.url}`).then(response => response.json()).then(data => this.allPokemons.push(data)).catch(error => console.error(error))
+    }
+    console.log(this.allPokemons)
 
   },
   methods : {
     getUrls() {
+      this.pokemons = []
       const results = this.data.results
 
       for (let pokemon of results){
@@ -72,11 +83,25 @@ export default {
     removeFeatured(){
       this.isVisibleFeatured = !this.isVisibleFeatured
     },
-  },
-  watch: {
-    pokemons(newPokemons, oldPokemons) {
-      this.pokemons = newPokemons
+    setSearchedPokemon(pokemons) {
+      this.pokemons = pokemons
+    },
+    async liveSearcher(liveInputSearchValue) {
+
+
+      this.pokemons = this.allPokemons.filter(pokemon => {
+        const inputLength = liveInputSearchValue.length;
+        const pokemonName = pokemon.name;
+        const equivalentSearchedWord = pokemonName.slice(0,inputLength)
+
+        return equivalentSearchedWord === liveInputSearchValue
+      })
     }
-  }
+  },
+  // watch: {
+  //   pokemons(newPokemons, oldPokemons) {
+  //     this.pokemons = newPokemons
+  //   }
+  // }
 }
 </script>
