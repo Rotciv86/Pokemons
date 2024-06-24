@@ -2,7 +2,7 @@
     <div>
         <form @submit.prevent="searcher" class="flex items-end gap-8">
             <div class="flex flex-col w-1/3">
-                <label class="pb-4" for="filter">Pokemon</label>
+                <label class="pb-4 text-emerald-700" for="filter">Pokemon</label>
                 <input class="rounded-xl border-2 p-2" type="text" name="filter" id="filter" placeholder="Write the name of the pokemon you want" v-model="searched">
             </div>
             <button class="px-8 py-2 h-[44px] rounded-xl bg-emerald-500 text-white hover:bg-emerald-200 " type="submit">Search</button>
